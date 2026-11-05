@@ -34,12 +34,10 @@
     .section { margin: 12px; padding: 14px; border: 1px solid #ffffff14; border-radius: 10px; background: #1e293b; }
     .section h2 { margin: 0 0 7px; font-size: 14px; }
     .section p { margin: 0 0 11px; color: #a7b3c5; font-size: 12px; }
-    .field { width: 100%; margin: 0 0 8px; }
     .section form { display: flex; gap: 7px; }
-    .section form .field { flex: 1; margin: 0; }
+    .section form .field { flex: 1; width: 100%; }
     .embed-frame { display: block; width: 100%; height: 230px; margin-top: 10px; border: 0; border-radius: 7px; background: #05080e; }
-    .help, .status { margin-top: 8px !important; color: #fbbf24 !important; font-size: 11px !important; }
-    .status { min-height: 16px; }
+    .status { min-height: 16px; margin-top: 8px !important; color: #fbbf24 !important; font-size: 11px !important; }
     .credit { padding: 0 14px 14px; color: #94a3b8; font-size: 11px; }
     .leaflet-container { background: #020817; }
     .leaflet-control-zoom a { background: #0f172a !important; color: white !important; }
@@ -88,11 +86,10 @@
 
       <section class="section">
         <h2 data-i18n="streetTitle">Street View</h2>
-        <p data-i18n="streetHelp">Search for a place or click the map, then load Street View here. Coverage depends on Google Maps. A Google Maps Embed API key is required.</p>
-        <input class="field" id="google-key" type="password" autocomplete="off" placeholder="Google Maps Embed API key" aria-label="Google Maps Embed API key">
+        <p data-i18n="streetHelp">Search for a place or click the map, then load Street View here. No API key is requested. Availability and embedding are controlled by Google.</p>
         <button class="primary" id="load-street" type="button" data-i18n="loadStreet">Load Street View</button>
         <iframe id="street-frame" class="embed-frame" title="Google Street View" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="about:blank"></iframe>
-        <p id="street-status" class="status" role="status" data-i18n="streetStatus">Enter a key, search or click a map location, then load Street View.</p>
+        <p id="street-status" class="status" role="status" data-i18n="streetStatus">Search or click the map, then load Street View.</p>
       </section>
 
       <section class="section">
@@ -112,37 +109,29 @@
   <script>
     window.addEventListener('DOMContentLoaded', () => {
       const translations = {
-        en: { search:'Search', searching:'Searching…', satellite:'Satellite', streets:'Streets', dark:'Dark', title:'Lebuba World Explorer', tagline:'Explore maps, street-level imagery, and public webcams.', language:'Language', streetTitle:'Street View', streetHelp:'Search for a place or click the map, then load Street View here. Coverage depends on Google Maps. A Google Maps Embed API key is required.', loadStreet:'Load Street View', streetStatus:'Enter a key, search or click a map location, then load Street View.', webcamTitle:'Public webcam', webcamHelp:'Paste an individual Windy webcam ID or official player URL. The player appears below without leaving Lebuba. Only cameras that permit embedding can play.', loadCam:'Load', noCam:'No camera selected yet.', credit:'Map data: OpenStreetMap, CARTO, and Esri. Google and webcam content are provided by their respective services and require internet access.', badKey:'Enter your Google Maps Embed API key first.', streetLoaded:'Street View requested for the selected location. If unavailable, Google has no panorama there or the key/API setup needs attention.', badCam:'Enter a Windy webcam ID or official player URL.', camLoading:'Loading the selected webcam. Offline or non-embeddable feeds may remain blank.', camLoaded:'Player loaded; the provider controls whether the feed is live and embeddable.', notFound:'Location not found. Try adding a city or country.', searchFailed:'Search failed. Check your internet connection and try again.' },
-        es: { search:'Buscar', searching:'Buscando…', satellite:'Satélite', streets:'Calles', dark:'Oscuro', title:'Lebuba Explora el Mundo', tagline:'Explora mapas, vistas a nivel de calle y cámaras públicas.', language:'Idioma', streetTitle:'Vista de calle', streetHelp:'Busca un lugar o haz clic en el mapa y carga Street View aquí. La cobertura depende de Google Maps. Se requiere una clave de Google Maps Embed API.', loadStreet:'Cargar Street View', streetStatus:'Introduce una clave, busca o haz clic en el mapa y carga Street View.', webcamTitle:'Cámara pública', webcamHelp:'Pega el ID de una cámara Windy o su URL oficial del reproductor. El reproductor aparece aquí sin salir de Lebuba. Solo funcionan cámaras que permiten inserción.', loadCam:'Cargar', noCam:'Aún no se ha seleccionado ninguna cámara.', credit:'Mapa: OpenStreetMap, CARTO y Esri. Google y las cámaras dependen de sus proveedores y requieren internet.', badKey:'Primero introduce tu clave de Google Maps Embed API.', streetLoaded:'Street View solicitado. Si no está disponible, puede que no haya panorama en ese lugar o que la clave/API necesite configuración.', badCam:'Introduce un ID de cámara Windy o la URL oficial del reproductor.', camLoading:'Cargando cámara. Si está desconectada o no permite inserción, puede quedar en blanco.', camLoaded:'Reproductor cargado; el proveedor determina si la cámara está activa y permite inserción.', notFound:'No se encontró el lugar. Añade una ciudad o país.', searchFailed:'Error de búsqueda. Comprueba tu conexión e inténtalo de nuevo.' },
-        fr: { search:'Rechercher', searching:'Recherche…', satellite:'Satellite', streets:'Rues', dark:'Sombre', title:'Lebuba Explorateur du monde', tagline:'Explorez les cartes, les vues de rue et les webcams publiques.', language:'Langue', streetTitle:'Vue de rue', streetHelp:'Recherchez un lieu ou cliquez sur la carte, puis chargez Street View ici. La couverture dépend de Google Maps. Une clé Google Maps Embed API est nécessaire.', loadStreet:'Charger Street View', streetStatus:'Saisissez une clé, recherchez ou cliquez sur la carte, puis chargez Street View.', webcamTitle:'Webcam publique', webcamHelp:'Collez un ID de webcam Windy ou son URL officielle de lecteur. Le lecteur s’affiche ici sans quitter Lebuba. Seules les caméras autorisant l’intégration peuvent fonctionner.', loadCam:'Charger', noCam:'Aucune caméra sélectionnée.', credit:'Carte : OpenStreetMap, CARTO et Esri. Google et les webcams dépendent de leurs fournisseurs et nécessitent Internet.', badKey:'Saisissez d’abord votre clé Google Maps Embed API.', streetLoaded:'Street View demandé. Si indisponible, il peut ne pas y avoir de panorama à cet endroit ou la clé/API doit être configurée.', badCam:'Saisissez un ID de webcam Windy ou son URL officielle de lecteur.', camLoading:'Chargement de la webcam. Un flux hors ligne ou non intégrable peut rester vide.', camLoaded:'Lecteur chargé ; le fournisseur détermine si le flux est actif et intégrable.', notFound:'Lieu introuvable. Ajoutez une ville ou un pays.', searchFailed:'Échec de la recherche. Vérifiez votre connexion et réessayez.' },
-        zh: { search:'搜索', searching:'搜索中…', satellite:'卫星', streets:'街道', dark:'深色', title:'Lebuba 世界探索', tagline:'探索地图、街景和公共网络摄像头。', language:'语言', streetTitle:'街景', streetHelp:'搜索地点或点击地图，然后在此加载街景。覆盖范围取决于 Google 地图。需要 Google Maps Embed API 密钥。', loadStreet:'加载街景', streetStatus:'输入密钥，搜索或点击地图位置，然后加载街景。', webcamTitle:'公共摄像头', webcamHelp:'粘贴单个 Windy 摄像头 ID 或官方播放器网址。播放器将在 Lebuba 页面内显示。仅允许嵌入的摄像头可播放。', loadCam:'加载', noCam:'尚未选择摄像头。', credit:'地图数据：OpenStreetMap、CARTO 和 Esri。Google 和摄像头内容由各自服务提供，需要互联网连接。', badKey:'请先输入 Google Maps Embed API 密钥。', streetLoaded:'已请求所选位置的街景。如果不可用，该位置可能没有全景，或密钥/API 尚未正确设置。', badCam:'请输入 Windy 摄像头 ID 或官方播放器网址。', camLoading:'正在加载摄像头。离线或禁止嵌入的直播可能无法显示。', camLoaded:'播放器已加载；直播状态和嵌入权限由服务提供方决定。', notFound:'找不到该地点。请补充城市或国家。', searchFailed:'搜索失败。请检查网络后重试。' }
+        en: { search:'Search', searching:'Searching…', satellite:'Satellite', streets:'Streets', dark:'Dark', title:'Lebuba World Explorer', tagline:'Explore maps, street-level imagery, and public webcams.', language:'Language', streetTitle:'Street View', streetHelp:'Search for a place or click the map, then load Street View here. No API key is requested. Availability and embedding are controlled by Google.', loadStreet:'Load Street View', streetStatus:'Search or click the map, then load Street View.', webcamTitle:'Public webcam', webcamHelp:'Paste an individual Windy webcam ID or official player URL. The player appears below without leaving Lebuba. Only cameras that permit embedding can play.', loadCam:'Load', noCam:'No camera selected yet.', credit:'Map data: OpenStreetMap, CARTO, and Esri. Google and webcam content are provided by their respective services and require internet access.', badCam:'Enter a Windy webcam ID or official player URL.', camLoading:'Loading the selected webcam. Offline or non-embeddable feeds may remain blank.', camLoaded:'Player loaded; the provider controls whether the feed is live and embeddable.', notFound:'Location not found. Try adding a city or country.', searchFailed:'Search failed. Check your internet connection and try again.', streetRequested:'Street View requested for the selected location. If it stays blank, coverage may be unavailable or Google may block embedding.' },
+        es: { search:'Buscar', searching:'Buscando…', satellite:'Satélite', streets:'Calles', dark:'Oscuro', title:'Lebuba Explora el Mundo', tagline:'Explora mapas, vistas a nivel de calle y cámaras públicas.', language:'Idioma', streetTitle:'Vista de calle', streetHelp:'Busca un lugar o haz clic en el mapa y carga Street View aquí. No se solicita una clave API. Google controla la cobertura y la inserción.', loadStreet:'Cargar Street View', streetStatus:'Busca o haz clic en el mapa y carga Street View.', webcamTitle:'Cámara pública', webcamHelp:'Pega el ID de una cámara Windy o su URL oficial del reproductor. El reproductor aparece aquí sin salir de Lebuba. Solo funcionan cámaras que permiten inserción.', loadCam:'Cargar', noCam:'Aún no se ha seleccionado ninguna cámara.', credit:'Mapa: OpenStreetMap, CARTO y Esri. Google y las cámaras dependen de sus proveedores y requieren internet.', badCam:'Introduce un ID de cámara Windy o la URL oficial del reproductor.', camLoading:'Cargando cámara. Si está desconectada o no permite inserción, puede quedar en blanco.', camLoaded:'Reproductor cargado; el proveedor determina si la cámara está activa y permite inserción.', notFound:'No se encontró el lugar. Añade una ciudad o país.', searchFailed:'Error de búsqueda. Comprueba tu conexión e inténtalo de nuevo.', streetRequested:'Street View solicitado. Si queda en blanco, puede no haber cobertura o Google puede bloquear la inserción.' },
+        fr: { search:'Rechercher', searching:'Recherche…', satellite:'Satellite', streets:'Rues', dark:'Sombre', title:'Lebuba Explorateur du monde', tagline:'Explorez les cartes, les vues de rue et les webcams publiques.', language:'Langue', streetTitle:'Vue de rue', streetHelp:'Recherchez un lieu ou cliquez sur la carte, puis chargez Street View ici. Aucune clé API n’est demandée. Google contrôle la couverture et l’intégration.', loadStreet:'Charger Street View', streetStatus:'Recherchez ou cliquez sur la carte, puis chargez Street View.', webcamTitle:'Webcam publique', webcamHelp:'Collez un ID de webcam Windy ou son URL officielle de lecteur. Le lecteur s’affiche ici sans quitter Lebuba. Seules les caméras autorisant l’intégration peuvent fonctionner.', loadCam:'Charger', noCam:'Aucune caméra sélectionnée.', credit:'Carte : OpenStreetMap, CARTO et Esri. Google et les webcams dépendent de leurs fournisseurs et nécessitent Internet.', badCam:'Saisissez un ID de webcam Windy ou son URL officielle de lecteur.', camLoading:'Chargement de la webcam. Un flux hors ligne ou non intégrable peut rester vide.', camLoaded:'Lecteur chargé ; le fournisseur détermine si le flux est actif et intégrable.', notFound:'Lieu introuvable. Ajoutez une ville ou un pays.', searchFailed:'Échec de la recherche. Vérifiez votre connexion et réessayez.', streetRequested:'Street View demandé. Si l’affichage reste vide, il peut ne pas y avoir de couverture ou Google peut bloquer l’intégration.' },
+        zh: { search:'搜索', searching:'搜索中…', satellite:'卫星', streets:'街道', dark:'深色', title:'Lebuba 世界探索', tagline:'探索地图、街景和公共网络摄像头。', language:'语言', streetTitle:'街景', streetHelp:'搜索地点或点击地图，然后在此加载街景。不需要输入 API 密钥。覆盖范围和嵌入由 Google 控制。', loadStreet:'加载街景', streetStatus:'搜索或点击地图位置，然后加载街景。', webcamTitle:'公共摄像头', webcamHelp:'粘贴单个 Windy 摄像头 ID 或官方播放器网址。播放器将在 Lebuba 页面内显示。仅允许嵌入的摄像头可播放。', loadCam:'加载', noCam:'尚未选择摄像头。', credit:'地图数据：OpenStreetMap、CARTO 和 Esri。Google 和摄像头内容由各自服务提供，需要互联网连接。', badCam:'请输入 Windy 摄像头 ID 或官方播放器网址。', camLoading:'正在加载摄像头。离线或禁止嵌入的直播可能无法显示。', camLoaded:'播放器已加载；直播状态和嵌入权限由服务提供方决定。', notFound:'找不到该地点。请补充城市或国家。', searchFailed:'搜索失败。请检查网络后重试。', streetRequested:'已请求所选位置的街景。如果画面空白，可能是该地点没有覆盖，或 Google 禁止嵌入。' }
       };
       let language = localStorage.getItem('lebuba-language') || 'en';
       if (!translations[language]) language = 'en';
       const languageSelect = document.getElementById('language-select');
-
       function t(key) { return translations[language][key] || translations.en[key] || key; }
       function setLanguage(next) {
         language = translations[next] ? next : 'en';
         document.documentElement.lang = language;
         languageSelect.value = language;
         localStorage.setItem('lebuba-language', language);
-        document.querySelectorAll('[data-i18n]').forEach(node => {
-          const key = node.dataset.i18n;
-          if (translations[language][key]) node.textContent = t(key);
-        });
+        document.querySelectorAll('[data-i18n]').forEach(node => { const key = node.dataset.i18n; if (translations[language][key]) node.textContent = t(key); });
         document.getElementById('place-query').placeholder = ({en:'Search a city, street, or place',es:'Buscar ciudad, calle o lugar',fr:'Rechercher une ville, rue ou un lieu',zh:'搜索城市、街道或地点'})[language];
         document.getElementById('cam-id').placeholder = ({en:'Windy webcam ID or player URL',es:'ID de cámara Windy o URL del reproductor',fr:'ID webcam Windy ou URL du lecteur',zh:'Windy 摄像头 ID 或播放器网址'})[language];
-        document.getElementById('google-key').placeholder = ({en:'Google Maps Embed API key',es:'Clave de Google Maps Embed API',fr:'Clé Google Maps Embed API',zh:'Google Maps Embed API 密钥'})[language];
       }
       languageSelect.addEventListener('change', () => setLanguage(languageSelect.value));
       setLanguage(language);
 
       const camStatus = document.getElementById('cam-status');
-      if (!window.L) {
-        camStatus.textContent = 'Map library could not load. Check your internet connection and reload.';
-        return;
-      }
+      if (!window.L) { camStatus.textContent = 'Map library could not load. Check your internet connection and reload.'; return; }
       const map = L.map('map', { center: [20, 0], zoom: 2, zoomControl: false, worldCopyJump: true });
       L.control.zoom({ position: 'bottomleft' }).addTo(map);
       const layers = {
@@ -184,28 +173,20 @@
           const popup = document.createElement('span');
           popup.textContent = place.display_name;
           marker.bindPopup(popup).openPopup();
-        } catch (error) {
-          console.error(error);
-          alert(t('searchFailed'));
-        } finally {
-          button.disabled = false;
-          button.textContent = t('search');
-        }
+        } catch (error) { console.error(error); alert(t('searchFailed')); }
+        finally { button.disabled = false; button.textContent = t('search'); }
       });
 
       document.getElementById('load-street').addEventListener('click', () => {
-        const key = document.getElementById('google-key').value.trim();
-        const status = document.getElementById('street-status');
-        if (!key) { status.textContent = t('badKey'); return; }
         const [lat, lon] = point;
-        const src = new URL('https://www.google.com/maps/embed/v1/streetview');
-        src.searchParams.set('key', key);
-        src.searchParams.set('location', `${lat},${lon}`);
-        src.searchParams.set('heading', '0');
-        src.searchParams.set('pitch', '0');
-        src.searchParams.set('fov', '80');
-        document.getElementById('street-frame').src = src.toString();
-        status.textContent = t('streetLoaded');
+        // Legacy Google Maps Street View embed URL; availability and iframe behavior are controlled by Google.
+        const panoUrl = new URL('https://maps.google.com/maps');
+        panoUrl.searchParams.set('layer', 'c');
+        panoUrl.searchParams.set('cbll', `${lat},${lon}`);
+        panoUrl.searchParams.set('cbp', '12,0,0,0,0');
+        panoUrl.searchParams.set('output', 'svembed');
+        document.getElementById('street-frame').src = panoUrl.toString();
+        document.getElementById('street-status').textContent = t('streetRequested');
       });
 
       document.getElementById('cam-form').addEventListener('submit', event => {
