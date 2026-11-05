@@ -3,542 +3,213 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lebuba | Global Earth & Live Cam Command</title>
-
+    <meta name="theme-color" content="#0b0f19" />
+    <title>Lebuba | Explore the World</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; height: 100%; overflow: hidden; background: #0b0f19; color: #e2e8f0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        button, input { font: inherit; }
+        #app-container { display: flex; width: 100vw; height: 100dvh; }
+        #map-section { position: relative; flex: 1 1 auto; min-width: 0; height: 100%; }
+        #map { width: 100%; height: 100%; background: #020817; }
+        .search-box, .map-layer-toggle { position: absolute; z-index: 1000; background: rgba(15, 23, 42, .94); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 8px; backdrop-filter: blur(10px); box-shadow: 0 8px 30px #0004; }
+        .search-box { top: 16px; left: 16px; display: flex; gap: 8px; }
+        .search-box input { width: min(34vw, 320px); min-width: 170px; padding: 10px 12px; color: #f8fafc; background: #1e293bcc; border: 1px solid #ffffff20; border-radius: 7px; outline: none; }
+        .search-box input::placeholder { color: #94a3b8; }
+        .search-box button, .street-view-btn { padding: 10px 14px; color: white; font-weight: 700; border: 0; border-radius: 7px; background: #2563eb; cursor: pointer; }
+        .search-box button:hover, .street-view-btn:hover { background: #1d4ed8; }
+        .map-layer-toggle { top: 16px; right: 16px; display: flex; gap: 4px; }
+        .layer-btn { padding: 7px 10px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #cbd5e1; font-size: 12px; cursor: pointer; }
+        .layer-btn.active { background: #334155; color: #fff; }
+        #cam-section { display: flex; flex-direction: column; width: 390px; height: 100%; background: #0f172a; border-left: 1px solid #ffffff1a; }
+        .panel-header { padding: 16px; background: #1e293b; border-bottom: 1px solid #ffffff12; }
+        .panel-header h1 { font-size: 17px; }
+        .panel-header p { margin-top: 5px; color: #94a3b8; font-size: 12px; line-height: 1.5; }
+        .street-card { margin: 12px; padding: 14px; border: 1px solid #ffffff12; background: #1e293b; border-radius: 10px; }
+        .street-card h2 { font-size: 14px; margin-bottom: 6px; }
+        .street-card p { margin-bottom: 12px; color: #94a3b8; font-size: 12px; line-height: 1.5; }
+        .street-view-btn { display: inline-block; text-decoration: none; font-size: 12px; }
+        .section-heading { padding: 12px 16px; background: #1e293b; border-top: 1px solid #ffffff12; border-bottom: 1px solid #ffffff12; font-size: 14px; }
+        .cam-list-container { flex: 1; overflow-y: auto; padding: 12px; }
+        .cam-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 12px; margin-bottom: 8px; border: 1px solid #ffffff0d; border-radius: 8px; background: #1e293b; cursor: pointer; transition: background .15s, border-color .15s; }
+        .cam-item:hover, .cam-item:focus { background: #334155; border-color: #ffffff30; outline: none; }
+        .cam-info { min-width: 0; }
+        .cam-info h3 { margin-bottom: 3px; color: #f8fafc; font-size: 13px; }
+        .cam-info p { color: #94a3b8; font-size: 11px; }
+        .watch-btn { flex: 0 0 auto; padding: 6px 9px; border: 0; border-radius: 5px; background: #3b82f6; color: white; font-size: 11px; font-weight: 700; cursor: pointer; }
+        .custom-pin { width: 13px; height: 13px; border: 2px solid white; border-radius: 50%; background: #ef4444; box-shadow: 0 0 10px #ef4444cc; }
+        .leaflet-container { background: #020817; }
+        .leaflet-control-zoom a { background: #0f172a !important; color: white !important; }
+        .notice { padding: 0 14px 14px; color: #94a3b8; font-size: 11px; line-height: 1.5; }
+        @media (max-width: 850px) {
+            html, body { overflow: auto; }
+            #app-container { height: auto; min-height: 100dvh; flex-direction: column; }
+            #map-section { flex: none; height: 58dvh; min-height: 360px; }
+            #cam-section { width: 100%; height: auto; min-height: 430px; border-left: 0; border-top: 1px solid #ffffff1a; }
+            .search-box { top: 10px; left: 10px; right: 10px; }
+            .search-box input { width: 100%; min-width: 0; }
+            .map-layer-toggle { top: 68px; left: 10px; right: auto; }
         }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #0b0f19;
-            color: #e2e8f0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-        }
-
-        #app-container {
-            display: flex;
-            width: 100vw;
-            height: 100vh;
-        }
-
-        #map-section {
-            position: relative;
-            flex: 1 1 auto;
-            height: 100%;
-            min-width: 0;
-        }
-
-        #map {
-            width: 100%;
-            height: 100%;
-            background: #020817;
-        }
-
-        .search-box {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 10px;
-            padding: 8px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22);
-        }
-
-        .search-box input {
-            width: min(36vw, 320px);
-            min-width: 180px;
-            padding: 10px 12px;
-            background: rgba(30, 41, 59, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 7px;
-            color: #f8fafc;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .search-box input::placeholder {
-            color: #94a3b8;
-        }
-
-        .search-box button {
-            border: none;
-            border-radius: 7px;
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            padding: 10px 16px;
-            transition: transform 0.12s ease, filter 0.2s ease;
-        }
-
-        .search-box button:hover {
-            filter: brightness(1.06);
-        }
-
-        .search-box button:active {
-            transform: translateY(1px);
-        }
-
-        .map-layer-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            gap: 6px;
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 10px;
-            padding: 6px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .layer-btn {
-            border: 1px solid transparent;
-            background: transparent;
-            color: #94a3b8;
-            padding: 7px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.18s ease;
-        }
-
-        .layer-btn:hover {
-            background: rgba(148, 163, 184, 0.08);
-            color: #e2e8f0;
-        }
-
-        .layer-btn.active {
-            background: #334155;
-            color: white;
-            border-color: rgba(255, 255, 255, 0.16);
-        }
-
-        #cam-section {
-            width: 460px;
-            height: 100%;
-            background: #0f172a;
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .panel-header {
-            padding: 16px;
-            background: #1e293b;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .panel-header h2 {
-            font-size: 16px;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-        }
-
-        .cam-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(160px, 1fr));
-            grid-template-rows: repeat(2, minmax(140px, 1fr));
-            gap: 4px;
-            background: #020617;
-            padding: 4px;
-            height: 380px;
-        }
-
-        .cam-box {
-            position: relative;
-            background: #000;
-            overflow: hidden;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .cam-box iframe,
-        .cam-box video {
-            width: 100%;
-            height: 100%;
-            border: none;
-            object-fit: cover;
-            background: #000;
-        }
-
-        .cam-title {
-            position: absolute;
-            left: 8px;
-            bottom: 8px;
-            background: rgba(0, 0, 0, 0.62);
-            color: #e2e8f0;
-            padding: 4px 8px;
-            border-radius: 5px;
-            font-size: 10px;
-            font-weight: 600;
-            line-height: 1.2;
-            pointer-events: none;
-            max-width: calc(100% - 16px);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .cam-list-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px;
-        }
-
-        .cam-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 10px 12px;
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 8px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.18s ease;
-        }
-
-        .cam-item:hover {
-            background: #334155;
-            border-color: rgba(255, 255, 255, 0.18);
-            transform: translateY(-1px);
-        }
-
-        .cam-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .cam-info h4 {
-            font-size: 13px;
-            color: #f8fafc;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .cam-info p {
-            font-size: 11px;
-            color: #94a3b8;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .watch-btn {
-            border: none;
-            border-radius: 5px;
-            padding: 6px 10px;
-            background: #3b82f6;
-            color: white;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .custom-pin {
-            width: 12px;
-            height: 12px;
-            background: #ef4444;
-            border: 2px solid #ffffff;
-            border-radius: 50%;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.85);
-        }
-
-        .leaflet-container {
-            background: #020817;
-        }
-
-        .leaflet-control-zoom {
-            border: none !important;
-            border-radius: 10px !important;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18) !important;
-        }
-
-        .leaflet-control-zoom a {
-            background: rgba(15, 23, 42, 0.9) !important;
-            color: #f8fafc !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-        }
-
-        @media (max-width: 980px) {
-            #app-container {
-                flex-direction: column;
-            }
-
-            #map-section {
-                height: 60vh;
-            }
-
-            #cam-section {
-                width: 100%;
-                height: 40vh;
-                min-height: 360px;
-            }
-        }
+        @media (max-width: 430px) { .search-box input { font-size: 12px; } .search-box button { padding: 9px 10px; } }
     </style>
 </head>
 <body>
-    <div id="app-container">
-        <div id="map-section">
-            <div class="search-box">
-                <input id="address-input" type="text" placeholder="Search any street, city, or location..." />
-                <button id="search-btn" type="button">Search</button>
-            </div>
-
-            <div class="map-layer-toggle">
+    <main id="app-container">
+        <section id="map-section" aria-label="Interactive map">
+            <form class="search-box" id="search-form" role="search">
+                <input id="address-input" type="search" placeholder="Search a city, street, or place..." aria-label="Search for a place" autocomplete="off" />
+                <button type="submit">Search</button>
+            </form>
+            <nav class="map-layer-toggle" aria-label="Map style">
                 <button class="layer-btn active" id="btn-sat" type="button">Satellite</button>
                 <button class="layer-btn" id="btn-street" type="button">Streets</button>
-                <button class="layer-btn" id="btn-dark" type="button">Dark Map</button>
-            </div>
-
+                <button class="layer-btn" id="btn-dark" type="button">Dark</button>
+            </nav>
             <div id="map"></div>
-        </div>
-
+        </section>
         <aside id="cam-section">
-            <div class="panel-header">
-                <h2>Live Feed Matrix</h2>
-            </div>
-
-            <div class="cam-grid">
-                <div class="cam-box" id="slot-0">
-                    <iframe src="" allowfullscreen></iframe>
-                    <div class="cam-title" id="title-0">Loading stream...</div>
-                </div>
-                <div class="cam-box" id="slot-1">
-                    <iframe src="" allowfullscreen></iframe>
-                    <div class="cam-title" id="title-1">Loading stream...</div>
-                </div>
-                <div class="cam-box" id="slot-2">
-                    <iframe src="" allowfullscreen></iframe>
-                    <div class="cam-title" id="title-2">Loading stream...</div>
-                </div>
-                <div class="cam-box" id="slot-3">
-                    <iframe src="" allowfullscreen></iframe>
-                    <div class="cam-title" id="title-3">Loading stream...</div>
-                </div>
-            </div>
-
-            <div class="panel-header" style="border-top: 1px solid rgba(255,255,255,0.08);">
-                <h2>Select Global Camera</h2>
-            </div>
-
-            <div class="cam-list-container" id="camera-list"></div>
+            <header class="panel-header">
+                <h1>Lebuba Explorer</h1>
+                <p>Explore map imagery, find street-level coverage, and open public webcam sources.</p>
+            </header>
+            <section class="street-card" aria-labelledby="street-heading">
+                <h2 id="street-heading">Street-level view</h2>
+                <p>Choose a place on the map or search first, then open Google Maps Street View. Street-level imagery is available only where Google has coverage.</p>
+                <a id="street-view-link" class="street-view-btn" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Open Street View</a>
+            </section>
+            <h2 class="section-heading">Explore public webcams</h2>
+            <div id="camera-list" class="cam-list-container"></div>
+            <p class="notice">Webcams are supplied by their operators and third-party directories. Availability, live status, embedding, and coverage vary by place. This prototype does not access private cameras or guarantee worldwide coverage.</p>
         </aside>
-    </div>
+    </main>
 
     <script>
-        const map = L.map('map', {
-            center: [20, 0],
-            zoom: 2,
-            zoomControl: false,
-            worldCopyJump: true
-        });
-
-        L.control.zoom({ position: 'bottomleft' }).addTo(map);
-
-        const layers = {
-            sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri',
-                maxZoom: 19
-            }),
-            street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors',
-                maxZoom: 19
-            }),
-            dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; CARTO',
-                maxZoom: 19
-            })
-        };
-
-        layers.sat.addTo(map);
-
-        function setBaseLayer(layerKey) {
-            Object.keys(layers).forEach((key) => {
-                if (map.hasLayer(layers[key])) {
-                    map.removeLayer(layers[key]);
-                }
-            });
-
-            layers[layerKey].addTo(map);
-
-            document.querySelectorAll('.layer-btn').forEach((btn) => {
-                btn.classList.toggle('active', btn.id === `btn-${layerKey}`);
-            });
-        }
-
-        document.getElementById('btn-sat').addEventListener('click', () => setBaseLayer('sat'));
-        document.getElementById('btn-street').addEventListener('click', () => setBaseLayer('street'));
-        document.getElementById('btn-dark').addEventListener('click', () => setBaseLayer('dark'));
-
-        const cameraLocations = [
-            { name: 'Shibuya Crossing', city: 'Tokyo, Japan', lat: 35.6595, lng: 139.7004, embed: 'https://www.youtube.com/embed/live_stream?channel=UC4R8DWoMoI7CAwX8_LjQHig' },
-            { name: 'Times Square', city: 'New York, USA', lat: 40.7580, lng: -73.9855, embed: 'https://www.youtube.com/embed/1-iS7LArMPA?autoplay=1&mute=1' },
-            { name: 'ISS Earth Live', city: 'Low Earth Orbit', lat: 0, lng: 0, embed: 'https://www.youtube.com/embed/2g811Ko7BE8?autoplay=1&mute=1' },
-            { name: 'Grand Canal', city: 'Venice, Italy', lat: 45.4371, lng: 12.3326, embed: 'https://www.youtube.com/embed/v9S_474n2Rk?autoplay=1&mute=1' },
-            { name: 'Eiffel Tower View', city: 'Paris, France', lat: 48.8584, lng: 2.2945, embed: 'https://www.youtube.com/embed/J7g-aK1R4uA?autoplay=1&mute=1' },
-            { name: 'Miami Beach Boardwalk', city: 'Florida, USA', lat: 25.7907, lng: -80.1300, embed: 'https://www.youtube.com/embed/3990bS_3XyE?autoplay=1&mute=1' },
-            { name: 'Niagara Falls View', city: 'Ontario, Canada', lat: 43.0896, lng: -79.0849, embed: 'https://www.youtube.com/embed/2K95S8l6x7w?autoplay=1&mute=1' },
-            { name: 'London Eye', city: 'London, UK', lat: 51.5033, lng: -0.1195, embed: 'https://www.youtube.com/embed/ScMzIvxBSi4?autoplay=1&mute=1' }
-        ];
-
-        let currentSlot = 0;
-        let searchMarker = null;
-
-        const listContainer = document.getElementById('camera-list');
-
-        function addMarkers() {
-            cameraLocations.forEach((cam) => {
-                if (cam.lat === 0 && cam.lng === 0) return;
-
-                const icon = L.divIcon({
-                    className: 'custom-pin',
-                    iconSize: [12, 12],
-                    iconAnchor: [6, 6]
-                });
-
-                const marker = L.marker([cam.lat, cam.lng], { icon }).addTo(map);
-                marker.bindPopup(`<b>${cam.name}</b><br>${cam.city}`);
-                marker.on('click', () => {
-                    loadCamToGrid(cam, currentSlot);
-                    currentSlot = (currentSlot + 1) % 4;
-                    map.flyTo([cam.lat, cam.lng], 12, { duration: 1.5 });
-                });
-            });
-        }
-
-        function renderCameraList() {
-            listContainer.innerHTML = '';
-
-            cameraLocations.forEach((cam) => {
-                const item = document.createElement('div');
-                item.className = 'cam-item';
-                item.innerHTML = `
-                    <div class="cam-info">
-                        <h4>${cam.name}</h4>
-                        <p>${cam.city}</p>
-                    </div>
-                    <button class="watch-btn" type="button">Stream</button>
-                `;
-
-                item.addEventListener('click', () => {
-                    if (cam.lat !== 0 || cam.lng !== 0) {
-                        map.flyTo([cam.lat, cam.lng], 13, { duration: 1.4 });
-                    }
-                    loadCamToGrid(cam, currentSlot);
-                    currentSlot = (currentSlot + 1) % 4;
-                });
-
-                listContainer.appendChild(item);
-            });
-        }
-
-        function loadCamToGrid(cam, slotIndex) {
-            const slot = document.getElementById(`slot-${slotIndex}`);
-            if (!slot) return;
-
-            const iframe = slot.querySelector('iframe');
-            const title = document.getElementById(`title-${slotIndex}`);
-            if (!iframe || !title) return;
-
-            iframe.src = cam.embed;
-            title.textContent = `${cam.city} - ${cam.name}`;
-        }
-
-        function preloadDefaultCameras() {
-            const defaults = cameraLocations.slice(0, 4);
-            defaults.forEach((cam, index) => {
-                loadCamToGrid(cam, index);
-            });
-        }
-
-        async function searchLocation() {
-            const input = document.getElementById('address-input');
-            const query = input.value.trim();
-            if (!query) return;
-
-            try {
-                const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`;
-                const response = await fetch(url, {
-                    headers: {
-                        'Accept-Language': 'en'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Request failed: ${response.status}`);
-                }
-
-                const results = await response.json();
-                if (!results || results.length === 0) {
-                    alert('Location not found. Please try a different query.');
-                    return;
-                }
-
-                const place = results[0];
-                const lat = parseFloat(place.lat);
-                const lon = parseFloat(place.lon);
-
-                map.flyTo([lat, lon], 15, { duration: 2 });
-
-                if (searchMarker) {
-                    map.removeLayer(searchMarker);
-                }
-
-                searchMarker = L.marker([lat, lon]).addTo(map);
-                searchMarker.bindPopup(`<b>Location Target</b><br>${place.display_name}`).openPopup();
-            } catch (error) {
-                console.error('Search failed:', error);
-                alert('Location search failed. Please try again.');
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!window.L) {
+                document.getElementById('camera-list').textContent = 'The map library did not load. Check your internet connection and reload.';
+                return;
             }
-        }
 
-        document.getElementById('search-btn').addEventListener('click', searchLocation);
-        document.getElementById('address-input').addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                searchLocation();
+            const map = L.map('map', { center: [20, 0], zoom: 2, zoomControl: false, worldCopyJump: true });
+            L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+            const layers = {
+                sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri', maxZoom: 19 }),
+                street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors', maxZoom: 19 }),
+                dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 19 })
+            };
+            let activeLayer = 'sat';
+            layers[activeLayer].addTo(map);
+            let selectedPoint = [20, 0];
+            let searchMarker;
+
+            function updateStreetViewLink(point) {
+                selectedPoint = point;
+                const href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${encodeURIComponent(point[0] + ',' + point[1])}`;
+                document.getElementById('street-view-link').href = href;
             }
-        });
 
-        addMarkers();
-        renderCameraList();
-        preloadDefaultCameras();
-        map.invalidateSize();
+            function selectLayer(key) {
+                if (!layers[key]) return;
+                if (map.hasLayer(layers[activeLayer])) map.removeLayer(layers[activeLayer]);
+                activeLayer = key;
+                layers[key].addTo(map);
+                document.querySelectorAll('.layer-btn').forEach(button => button.classList.toggle('active', button.id === `btn-${key}`));
+            }
+            document.getElementById('btn-sat').addEventListener('click', () => selectLayer('sat'));
+            document.getElementById('btn-street').addEventListener('click', () => selectLayer('street'));
+            document.getElementById('btn-dark').addEventListener('click', () => selectLayer('dark'));
+
+            map.on('click', event => updateStreetViewLink([event.latlng.lat, event.latlng.lng]));
+
+            const places = [
+                { name: 'Tokyo', country: 'Japan', lat: 35.6762, lng: 139.6503 },
+                { name: 'New York City', country: 'United States', lat: 40.7128, lng: -74.0060 },
+                { name: 'London', country: 'United Kingdom', lat: 51.5072, lng: -0.1276 },
+                { name: 'Paris', country: 'France', lat: 48.8566, lng: 2.3522 },
+                { name: 'Singapore', country: 'Singapore', lat: 1.3521, lng: 103.8198 },
+                { name: 'Sydney', country: 'Australia', lat: -33.8688, lng: 151.2093 },
+                { name: 'Toronto', country: 'Canada', lat: 43.6532, lng: -79.3832 },
+                { name: 'Rio de Janeiro', country: 'Brazil', lat: -22.9068, lng: -43.1729 }
+            ];
+
+            const pins = L.divIcon({ className: 'custom-pin', iconSize: [13, 13], iconAnchor: [6, 6] });
+            const cameraList = document.getElementById('camera-list');
+            places.forEach(place => {
+                const marker = L.marker([place.lat, place.lng], { icon: pins }).addTo(map);
+                marker.bindPopup(`<strong>${place.name}</strong><br>${place.country}`);
+                marker.on('click', () => updateStreetViewLink([place.lat, place.lng]));
+
+                const row = document.createElement('div');
+                row.className = 'cam-item';
+                row.tabIndex = 0;
+                row.setAttribute('role', 'button');
+                row.setAttribute('aria-label', `Explore webcams near ${place.name}, ${place.country}`);
+                const info = document.createElement('div');
+                info.className = 'cam-info';
+                const title = document.createElement('h3');
+                title.textContent = place.name;
+                const subtitle = document.createElement('p');
+                subtitle.textContent = `${place.country} · public webcam directory`;
+                info.append(title, subtitle);
+                const button = document.createElement('button');
+                button.className = 'watch-btn';
+                button.type = 'button';
+                button.textContent = 'Webcams';
+                row.append(info, button);
+                const openPlace = () => {
+                    map.flyTo([place.lat, place.lng], 11, { duration: 1.2 });
+                    updateStreetViewLink([place.lat, place.lng]);
+                    // Windy's public webcam map is opened rather than embedding unverified or unauthorized streams.
+                    window.open('https://www.windy.com/-Webcams/webcams', '_blank', 'noopener,noreferrer');
+                };
+                row.addEventListener('click', openPlace);
+                row.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openPlace(); }
+                });
+                cameraList.appendChild(row);
+            });
+
+            async function searchLocation(event) {
+                event.preventDefault();
+                const input = document.getElementById('address-input');
+                const query = input.value.trim();
+                if (!query) { input.focus(); return; }
+                const submit = document.querySelector('#search-form button');
+                const oldLabel = submit.textContent;
+                submit.disabled = true;
+                submit.textContent = 'Searching…';
+                try {
+                    const endpoint = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`;
+                    const response = await fetch(endpoint, { headers: { 'Accept-Language': 'en' } });
+                    if (!response.ok) throw new Error(`Search service returned ${response.status}`);
+                    const results = await response.json();
+                    if (!results.length) { alert('Location not found. Try a more specific search.'); return; }
+                    const place = results[0];
+                    const lat = Number(place.lat);
+                    const lng = Number(place.lon);
+                    map.flyTo([lat, lng], 15, { duration: 1.5 });
+                    if (searchMarker) map.removeLayer(searchMarker);
+                    searchMarker = L.marker([lat, lng]).addTo(map);
+                    const popup = document.createElement('div');
+                    popup.textContent = place.display_name;
+                    searchMarker.bindPopup(popup).openPopup();
+                    updateStreetViewLink([lat, lng]);
+                } catch (error) {
+                    console.error('Location search failed:', error);
+                    alert('Location search failed. Check your connection and try again.');
+                } finally {
+                    submit.disabled = false;
+                    submit.textContent = oldLabel;
+                }
+            }
+            document.getElementById('search-form').addEventListener('submit', searchLocation);
+            updateStreetViewLink(selectedPoint);
+            requestAnimationFrame(() => map.invalidateSize());
+            window.addEventListener('resize', () => map.invalidateSize());
+        });
     </script>
 </body>
 </html>
