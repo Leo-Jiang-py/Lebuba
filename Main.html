@@ -3,173 +3,174 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b0f19">
+  <meta name="theme-color" content="#07111f">
   <title>Lebuba | World Explorer</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    * { box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; margin: 0; background: #0b0f19; color: #e2e8f0; font: 14px/1.45 system-ui, -apple-system, Segoe UI, sans-serif; }
-    body { overflow: hidden; }
-    button, input, select { font: inherit; }
-    #app { display: flex; width: 100%; height: 100dvh; }
-    #map-wrap { position: relative; flex: 1; min-width: 0; }
-    #map { width: 100%; height: 100%; background: #020817; }
-    .search { position: absolute; z-index: 1000; left: 16px; top: 16px; display: flex; gap: 7px; padding: 8px; border: 1px solid #ffffff20; border-radius: 10px; background: #0f172af2; box-shadow: 0 8px 24px #0005; }
-    .search input, .field { min-width: 0; padding: 10px 12px; color: #f8fafc; background: #1e293b; border: 1px solid #ffffff20; border-radius: 7px; outline: none; }
-    .search input { width: min(34vw, 320px); }
-    input::placeholder { color: #94a3b8; }
-    button { cursor: pointer; }
-    .primary { padding: 9px 13px; border: 0; border-radius: 7px; background: #2563eb; color: white; font-weight: 700; }
-    .primary:hover { background: #1d4ed8; }
-    .primary:disabled { opacity: .65; cursor: wait; }
-    .layers { position: absolute; z-index: 1000; top: 16px; right: 16px; display: flex; gap: 4px; padding: 6px; border: 1px solid #ffffff20; border-radius: 10px; background: #0f172af2; }
-    .layer { padding: 7px 10px; border: 0; border-radius: 6px; color: #cbd5e1; background: transparent; font-size: 12px; }
-    .layer.active { background: #334155; color: white; }
-    aside { display: flex; flex-direction: column; width: 390px; flex: 0 0 390px; overflow-y: auto; background: #0f172a; border-left: 1px solid #ffffff1a; }
-    header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 15px; background: #1e293b; border-bottom: 1px solid #ffffff12; }
-    header h1 { margin: 0; font-size: 18px; }
-    header p { margin: 5px 0 0; color: #a7b3c5; font-size: 12px; }
-    #language-select { max-width: 120px; padding: 7px; color: #f8fafc; background: #0f172a; border: 1px solid #ffffff25; border-radius: 7px; }
-    .section { margin: 12px; padding: 14px; border: 1px solid #ffffff14; border-radius: 10px; background: #1e293b; }
-    .section h2 { margin: 0 0 7px; font-size: 14px; }
-    .section p { margin: 0 0 11px; color: #a7b3c5; font-size: 12px; }
-    .section form { display: flex; gap: 7px; }
-    .section form .field { flex: 1; width: 100%; }
-    .embed-frame { display: block; width: 100%; height: 230px; margin-top: 10px; border: 0; border-radius: 7px; background: #05080e; }
-    .status { min-height: 16px; margin-top: 8px !important; color: #fbbf24 !important; font-size: 11px !important; }
-    .credit { padding: 0 14px 14px; color: #94a3b8; font-size: 11px; }
-    .leaflet-container { background: #020817; }
-    .leaflet-control-zoom a { background: #0f172a !important; color: white !important; }
-    @media (max-width: 800px) {
-      body { overflow: auto; }
-      #app { height: auto; min-height: 100dvh; flex-direction: column; }
-      #map-wrap { flex: none; height: 58dvh; min-height: 360px; }
-      aside { width: 100%; flex: none; overflow: visible; border: 0; border-top: 1px solid #ffffff1a; }
-      .search { left: 10px; right: 10px; top: 10px; }
-      .search input { width: 100%; }
-      .layers { left: 10px; right: auto; top: 66px; }
+    :root { color-scheme: dark; --bg:#07111f; --panel:#101d2d; --panel2:#142438; --line:#ffffff16; --muted:#9aacc1; --text:#eef5ff; --accent:#62e0bd; --blue:#76a9ff; }
+    * { box-sizing:border-box; }
+    html,body { width:100%; height:100%; margin:0; background:var(--bg); color:var(--text); font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    body { overflow:hidden; }
+    button,input,select { font:inherit; }
+    button { cursor:pointer; }
+    #app { display:grid; grid-template-columns:minmax(0,1fr) 390px; width:100%; height:100dvh; }
+    #map-wrap { position:relative; min-width:0; min-height:0; overflow:hidden; background:#0b1725; }
+    #map { width:100%; height:100%; background:#0b1725; }
+    .search { position:absolute; z-index:1000; top:20px; left:20px; display:flex; gap:8px; width:min(520px,calc(100% - 40px)); padding:8px; border:1px solid var(--line); border-radius:15px; background:#0b1725ed; box-shadow:0 16px 48px #0006; backdrop-filter:blur(16px); }
+    .search input,.field { min-width:0; width:100%; padding:11px 13px; border:1px solid #ffffff18; border-radius:9px; outline:none; background:#0b1725; color:var(--text); }
+    .search input { flex:1; }
+    input::placeholder { color:#8194aa; }
+    input:focus,select:focus { border-color:var(--accent); box-shadow:0 0 0 3px #62e0bd24; }
+    .button { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:40px; padding:9px 14px; border:0; border-radius:9px; color:#062017; background:var(--accent); font-weight:750; transition:transform .15s,filter .15s; }
+    .button:hover { filter:brightness(1.06); transform:translateY(-1px); }
+    .button:disabled { opacity:.65; cursor:wait; }
+    .button.secondary { color:var(--text); background:#263b53; }
+    .button.small { min-height:38px; padding:8px 12px; white-space:nowrap; }
+    .layers { position:absolute; z-index:1000; top:20px; right:20px; display:flex; gap:4px; max-width:calc(100% - 40px); overflow:auto; padding:6px; border:1px solid var(--line); border-radius:12px; background:#0b1725ed; box-shadow:0 12px 35px #0005; backdrop-filter:blur(16px); }
+    .layer { flex:none; padding:8px 10px; border:0; border-radius:8px; color:#bdcadd; background:transparent; font-size:12px; }
+    .layer:hover,.layer.active { color:white; background:#263b53; }
+    aside { display:flex; flex-direction:column; min-height:0; overflow-y:auto; border-left:1px solid var(--line); background:linear-gradient(180deg,#0d1a2a,#091321 55%); }
+    .brand { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:22px 20px 19px; border-bottom:1px solid var(--line); }
+    .brand-mark { display:flex; gap:12px; align-items:center; }
+    .logo { display:grid; width:42px; height:42px; place-items:center; flex:none; border-radius:14px; color:#062017; background:linear-gradient(145deg,#8af0d2,#55c9b5); font-size:22px; box-shadow:0 6px 24px #62e0bd35; }
+    h1 { margin:0; font-size:18px; letter-spacing:-.03em; }
+    .brand p { margin:4px 0 0; color:var(--muted); font-size:12px; }
+    #language-select { max-width:105px; padding:7px; border:1px solid var(--line); border-radius:8px; color:var(--text); background:var(--panel); }
+    .intro { padding:17px 20px 2px; }
+    .eyebrow { margin:0 0 5px; color:var(--accent); font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+    .intro h2 { margin:0; font-size:16px; letter-spacing:-.02em; }
+    .intro p { margin:5px 0 0; color:var(--muted); font-size:12px; }
+    .card { margin:14px 14px 0; padding:16px; border:1px solid var(--line); border-radius:15px; background:linear-gradient(145deg,#142438e8,#101d2de8); box-shadow:0 8px 24px #0002; }
+    .card-heading { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .icon { display:grid; width:32px; height:32px; place-items:center; border-radius:10px; background:#62e0bd18; font-size:16px; }
+    .card h3 { margin:0; font-size:13px; }
+    .card p { margin:0 0 12px; color:var(--muted); font-size:12px; }
+    .card .field { margin-bottom:9px; }
+    .card-actions { display:flex; flex-wrap:wrap; gap:8px; }
+    .embed-frame { display:block; width:100%; height:210px; margin-top:12px; border:1px solid var(--line); border-radius:11px; background:#050b13; }
+    .status { min-height:17px; margin:9px 0 0 !important; color:#b7c8dc !important; font-size:11px !important; }
+    .status.error { color:#ffb4a9 !important; }
+    .status.success { color:var(--accent) !important; }
+    .helper-link { display:inline-block; margin:2px 0 12px; color:#9cc0ff; font-size:12px; text-decoration:none; }
+    .helper-link:hover { text-decoration:underline; }
+    .hint { margin:10px 0 0 !important; padding:9px 10px; border-radius:9px; background:#071421; font-size:11px !important; }
+    .credit { margin:16px 20px 20px; color:#8295aa; font-size:10px; }
+    .credit a { color:#a9c7ee; }
+    .leaflet-container { background:#0b1725; }
+    .leaflet-control-zoom a { color:white !important; background:#102034 !important; border-color:#ffffff20 !important; }
+    .leaflet-control-attribution { font-size:10px !important; }
+    @media(max-width:980px) { #app { grid-template-columns:minmax(0,1fr) 350px; } .layers { top:78px; left:20px; right:auto; } }
+    @media(max-width:760px) {
+      body { overflow:auto; }
+      #app { display:flex; height:auto; min-height:100dvh; flex-direction:column; }
+      #map-wrap { flex:none; height:56dvh; min-height:340px; }
+      aside { overflow:visible; border:0; border-top:1px solid var(--line); }
+      .search { top:12px; left:12px; width:calc(100% - 24px); }
+      .layers { top:72px; left:12px; max-width:calc(100% - 24px); }
+      .layer { padding:7px 9px; }
+      .brand { padding:17px 16px; }
     }
+    @media(max-width:420px) { .search { gap:5px; padding:6px; } .search input { padding:10px; } .search .button { padding:8px 10px; } .card { margin-right:12px; margin-left:12px; } }
   </style>
 </head>
 <body>
   <main id="app">
-    <section id="map-wrap" aria-label="Map">
+    <section id="map-wrap" aria-label="Interactive map">
       <form class="search" id="search-form">
         <input id="place-query" type="search" placeholder="Search a city, street, or place" aria-label="Search a location" required>
-        <button class="primary" id="search-button" type="submit" data-i18n="search">Search</button>
+        <button class="button" id="search-button" type="submit">⌕ <span>Explore</span></button>
       </form>
-      <nav class="layers" aria-label="Map type">
-        <button class="layer active" type="button" data-layer="osm" data-i18n="streets">OpenStreetMap</button>
-        <button class="layer" type="button" data-layer="mapbox-streets" data-i18n="mapbox">Mapbox Streets</button>
-        <button class="layer" type="button" data-layer="mapbox-satellite" data-i18n="satellite">Mapbox Satellite</button>
-        <button class="layer" type="button" data-layer="dark" data-i18n="dark">Dark</button>
+      <nav class="layers" aria-label="Map style">
+        <button class="layer active" type="button" data-layer="osm">Streets</button>
+        <button class="layer" type="button" data-layer="mapbox-streets">Mapbox</button>
+        <button class="layer" type="button" data-layer="mapbox-satellite">Satellite</button>
+        <button class="layer" type="button" data-layer="dark">Night</button>
       </nav>
       <div id="map"></div>
     </section>
 
     <aside>
-      <header>
-        <div>
-          <h1 data-i18n="title">Lebuba World Explorer</h1>
-          <p data-i18n="tagline">Explore maps, street-level imagery, and public webcams.</p>
-        </div>
-        <label>
-          <span class="sr-only" data-i18n="language">Language</span>
-          <select id="language-select" aria-label="Language">
-            <option value="en">English</option>
-            <option value="es">Español</option>
-            <option value="fr">Français</option>
-            <option value="zh">中文</option>
-          </select>
-        </label>
+      <header class="brand">
+        <div class="brand-mark"><div class="logo" aria-hidden="true">⌖</div><div><h1>Lebuba Explorer</h1><p>A little closer to everywhere.</p></div></div>
+        <label><span class="sr-only" style="position:absolute;left:-10000px">Language</span><select id="language-select" aria-label="Language"><option value="en">English</option></select></label>
       </header>
+      <div class="intro"><p class="eyebrow">Discover the world</p><h2>Your window to somewhere new</h2><p>Search a place, choose a map, and explore what’s nearby.</p></div>
 
-      <section class="section">
-        <h2 data-i18n="mapboxTitle">Mapbox map styles</h2>
-        <p data-i18n="mapboxHelp">OpenStreetMap is the default. To use Mapbox styles, enter a Mapbox public access token. The token is saved only in this browser.</p>
-        <input class="field" id="mapbox-token" type="password" autocomplete="off" placeholder="Mapbox public token (pk.…)" aria-label="Mapbox public access token">
-        <button class="primary" id="save-mapbox-token" type="button" data-i18n="applyToken">Apply Mapbox token</button>
-        <p id="mapbox-status" class="status" role="status" data-i18n="mapboxStatus">Mapbox styles require your own public token. OpenStreetMap works without it.</p>
+      <section class="card">
+        <div class="card-heading"><span class="icon" aria-hidden="true">🗺️</span><h3>Map styles</h3></div>
+        <p>OpenStreetMap works straight away. Add your own Mapbox public token to unlock Mapbox styles.</p>
+        <input class="field" id="mapbox-token" type="password" autocomplete="off" placeholder="Mapbox public token (pk.… )" aria-label="Mapbox public access token">
+        <div class="card-actions"><button class="button small" id="save-mapbox-token" type="button">Save token</button></div>
+        <p id="mapbox-status" class="status" role="status">Your token is stored in this browser only.</p>
       </section>
 
-      <section class="section">
-        <h2 data-i18n="streetTitle">Street View</h2>
-        <p data-i18n="streetHelp">Search for a place or click the map, then load Street View here. No API key is requested. Availability and embedding are controlled by Google.</p>
-        <button class="primary" id="load-street" type="button" data-i18n="loadStreet">Load Street View</button>
+      <section class="card">
+        <div class="card-heading"><span class="icon" aria-hidden="true">🌐</span><h3>Street View</h3></div>
+        <p>Search for a place or click the map to set a location, then check for Google Street View imagery.</p>
+        <button class="button small" id="load-street" type="button">Load Street View</button>
         <iframe id="street-frame" class="embed-frame" title="Google Street View" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="about:blank"></iframe>
-        <p id="street-status" class="status" role="status" data-i18n="streetStatus">Search or click the map, then load Street View.</p>
+        <p id="street-status" class="status" role="status">Choose a location on the map first.</p>
       </section>
 
-      <section class="section">
-        <h2 data-i18n="webcamTitle">Public webcam</h2>
-        <p data-i18n="webcamHelp">Paste an individual Windy webcam ID or official player URL. The player appears below without leaving Lebuba. Only cameras that permit embedding can play.</p>
+      <section class="card">
+        <div class="card-heading"><span class="icon" aria-hidden="true">📡</span><h3>Free public webcams</h3></div>
+        <p>Load a public Windy webcam in the page using its ID or official player link.</p>
+        <a class="helper-link" href="https://www.windy.com/webcams" target="_blank" rel="noopener noreferrer">Find public webcams on Windy ↗</a>
         <form id="cam-form">
-          <input class="field" id="cam-id" type="text" placeholder="Windy webcam ID or player URL" aria-label="Windy webcam ID or player URL">
-          <button class="primary" type="submit" data-i18n="loadCam">Load</button>
+          <input class="field" id="cam-id" type="text" placeholder="Webcam ID or Windy player URL" aria-label="Windy webcam ID or player URL" autocomplete="url">
+          <div class="card-actions"><button class="button small" type="submit">Load webcam</button><a id="open-cam" class="button secondary small" href="https://www.windy.com/webcams" target="_blank" rel="noopener noreferrer" hidden>Open on Windy ↗</a></div>
         </form>
         <iframe id="webcam-player" class="embed-frame" title="Selected public webcam" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" src="about:blank"></iframe>
-        <p id="cam-status" class="status" role="status" data-i18n="noCam">No camera selected yet.</p>
+        <p id="cam-status" class="status" role="status">Choose a public camera on Windy and paste its ID or player URL.</p>
+        <p class="hint">Some camera owners or browsers block embedded playback. If it doesn’t load here, use “Open on Windy.” Provider branding and attribution are kept intact.</p>
       </section>
-      <p class="credit" data-i18n="credit">Map data: OpenStreetMap, CARTO, and Esri. Google and webcam content are provided by their respective services and require internet access.</p>
+      <p class="credit">Map data and imagery are provided by their respective services. <span id="map-credit">OpenStreetMap contributors</span>. Google and webcam content may have separate terms, attribution, and availability restrictions.</p>
     </aside>
   </main>
 
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      const translations = {
-        en: { search:'Search', searching:'Searching…', satellite:'Satellite', streets:'OpenStreetMap', mapbox:'Mapbox Streets', dark:'Dark', title:'Lebuba World Explorer', tagline:'Explore maps, street-level imagery, and public webcams.', language:'Language', mapboxTitle:'Mapbox map styles', mapboxHelp:'OpenStreetMap is the default. To use Mapbox styles, enter a Mapbox public access token. The token is saved only in this browser.', applyToken:'Apply Mapbox token', mapboxStatus:'Mapbox styles require your own public token. OpenStreetMap works without it.', tokenSaved:'Token saved in this browser. You can now select a Mapbox layer.', tokenMissing:'Enter a Mapbox public token beginning with pk.', streetTitle:'Street View', streetHelp:'Search for a place or click the map, then load Street View here. No API key is requested. Availability and embedding are controlled by Google.', loadStreet:'Load Street View', streetStatus:'Search or click the map, then load Street View.', webcamTitle:'Public webcam', webcamHelp:'Paste an individual Windy webcam ID or official player URL. The player appears below without leaving Lebuba. Only cameras that permit embedding can play.', loadCam:'Load', noCam:'No camera selected yet.', credit:'Map data: OpenStreetMap, CARTO, and Mapbox. Google and webcam content are provided by their respective services and require internet access.', badCam:'Enter a Windy webcam ID or official player URL.', camLoading:'Loading the selected webcam. Offline or non-embeddable feeds may remain blank.', camLoaded:'Player loaded; the provider controls whether the feed is live and embeddable.', notFound:'Location not found. Try adding a city or country.', searchFailed:'Search failed. Check your internet connection and try again.', streetRequested:'Street View requested for the selected location. If it stays blank, coverage may be unavailable or Google may block embedding.', tokenInvalid:'That does not look like a Mapbox public token (pk…).'},
-        es: { search:'Buscar', searching:'Buscando…', satellite:'Satélite', streets:'OpenStreetMap', mapbox:'Calles Mapbox', dark:'Oscuro', title:'Lebuba Explora el Mundo', tagline:'Explora mapas, vistas a nivel de calle y cámaras públicas.', language:'Idioma', mapboxTitle:'Estilos de mapa Mapbox', mapboxHelp:'OpenStreetMap es el mapa predeterminado. Para usar Mapbox, introduce un token público. Se guarda solo en este navegador.', applyToken:'Aplicar token Mapbox', mapboxStatus:'Los estilos Mapbox requieren tu token público. OpenStreetMap funciona sin él.', tokenSaved:'Token guardado en este navegador. Ya puedes elegir una capa Mapbox.', tokenMissing:'Introduce un token público de Mapbox que empiece por pk.', streetTitle:'Vista de calle', streetHelp:'Busca un lugar o haz clic en el mapa y carga Street View aquí. No se solicita una clave API. Google controla la cobertura y la inserción.', loadStreet:'Cargar Street View', streetStatus:'Busca o haz clic en el mapa y carga Street View.', webcamTitle:'Cámara pública', webcamHelp:'Pega el ID de una cámara Windy o su URL oficial del reproductor. Solo funcionan cámaras que permiten inserción.', loadCam:'Cargar', noCam:'Aún no se ha seleccionado ninguna cámara.', credit:'Mapa: OpenStreetMap y Mapbox. Google y las cámaras dependen de sus proveedores y requieren internet.', badCam:'Introduce un ID de cámara Windy o la URL oficial del reproductor.', camLoading:'Cargando cámara. Si está desconectada o no permite inserción, puede quedar en blanco.', camLoaded:'Reproductor cargado; el proveedor determina si la cámara está activa y permite inserción.', notFound:'No se encontró el lugar. Añade una ciudad o país.', searchFailed:'Error de búsqueda. Comprueba tu conexión e inténtalo de nuevo.', streetRequested:'Street View solicitado. Si queda en blanco, puede no haber cobertura o Google puede bloquear la inserción.', tokenInvalid:'El token no parece público de Mapbox (pk…).'},
-        fr: { search:'Rechercher', searching:'Recherche…', satellite:'Satellite', streets:'OpenStreetMap', mapbox:'Rues Mapbox', dark:'Sombre', title:'Lebuba Explorateur du monde', tagline:'Explorez les cartes, les vues de rue et les webcams publiques.', language:'Langue', mapboxTitle:'Styles de carte Mapbox', mapboxHelp:'OpenStreetMap est la carte par défaut. Pour utiliser Mapbox, saisissez un jeton public. Il est enregistré uniquement dans ce navigateur.', applyToken:'Appliquer le jeton Mapbox', mapboxStatus:'Les styles Mapbox nécessitent votre jeton public. OpenStreetMap fonctionne sans.', tokenSaved:'Jeton enregistré dans ce navigateur. Vous pouvez choisir une couche Mapbox.', tokenMissing:'Saisissez un jeton public Mapbox commençant par pk.', streetTitle:'Vue de rue', streetHelp:'Recherchez un lieu ou cliquez sur la carte, puis chargez Street View ici. Aucune clé API n’est demandée. Google contrôle la couverture et l’intégration.', loadStreet:'Charger Street View', streetStatus:'Recherchez ou cliquez sur la carte, puis chargez Street View.', webcamTitle:'Webcam publique', webcamHelp:'Collez un ID de webcam Windy ou son URL officielle. Seules les caméras autorisant l’intégration peuvent fonctionner.', loadCam:'Charger', noCam:'Aucune caméra sélectionnée.', credit:'Carte : OpenStreetMap et Mapbox. Google et les webcams dépendent de leurs fournisseurs et nécessitent Internet.', badCam:'Saisissez un ID de webcam Windy ou son URL officielle.', camLoading:'Chargement de la webcam. Un flux hors ligne ou non intégrable peut rester vide.', camLoaded:'Lecteur chargé ; le fournisseur détermine si le flux est actif et intégrable.', notFound:'Lieu introuvable. Ajoutez une ville ou un pays.', searchFailed:'Échec de la recherche. Vérifiez votre connexion et réessayez.', streetRequested:'Street View demandé. Si l’affichage reste vide, il peut ne pas y avoir de couverture ou Google peut bloquer l’intégration.', tokenInvalid:'Ce jeton ne semble pas être un jeton public Mapbox (pk…).'},
-        zh: { search:'搜索', searching:'搜索中…', satellite:'卫星', streets:'OpenStreetMap', mapbox:'Mapbox 街道', dark:'深色', title:'Lebuba 世界探索', tagline:'探索地图、街景和公共网络摄像头。', language:'语言', mapboxTitle:'Mapbox 地图样式', mapboxHelp:'默认使用 OpenStreetMap。使用 Mapbox 样式需要输入公开访问令牌。令牌仅保存在此浏览器中。', applyToken:'应用 Mapbox 令牌', mapboxStatus:'Mapbox 样式需要你自己的公开令牌；OpenStreetMap 无需令牌。', tokenSaved:'令牌已保存在此浏览器。现在可以选择 Mapbox 图层。', tokenMissing:'请输入以 pk 开头的 Mapbox 公开令牌。', streetTitle:'街景', streetHelp:'搜索地点或点击地图，然后在此加载街景。不需要输入 API 密钥。覆盖范围和嵌入由 Google 控制。', loadStreet:'加载街景', streetStatus:'搜索或点击地图位置，然后加载街景。', webcamTitle:'公共摄像头', webcamHelp:'粘贴单个 Windy 摄像头 ID 或官方播放器网址。仅允许嵌入的摄像头可播放。', loadCam:'加载', noCam:'尚未选择摄像头。', credit:'地图数据：OpenStreetMap 和 Mapbox。Google 和摄像头内容由各自服务提供，需要互联网连接。', badCam:'请输入 Windy 摄像头 ID 或官方播放器网址。', camLoading:'正在加载摄像头。离线或禁止嵌入的直播可能无法显示。', camLoaded:'播放器已加载；直播状态和嵌入权限由服务提供方决定。', notFound:'找不到该地点。请补充城市或国家。', searchFailed:'搜索失败。请检查网络后重试。', streetRequested:'已请求所选位置的街景。如果画面空白，可能是该地点没有覆盖，或 Google 禁止嵌入。', tokenInvalid:'这似乎不是 Mapbox 公开令牌（pk…）。'}
-      };
-      let language = localStorage.getItem('lebuba-language') || 'en';
-      if (!translations[language]) language = 'en';
-      const languageSelect = document.getElementById('language-select');
-      function t(key) { return translations[language][key] || translations.en[key] || key; }
-      function setLanguage(next) {
-        language = translations[next] ? next : 'en';
-        document.documentElement.lang = language;
-        languageSelect.value = language;
-        localStorage.setItem('lebuba-language', language);
-        document.querySelectorAll('[data-i18n]').forEach(node => { const key = node.dataset.i18n; if (translations[language][key]) node.textContent = t(key); });
-        document.getElementById('place-query').placeholder = ({en:'Search a city, street, or place',es:'Buscar ciudad, calle o lugar',fr:'Rechercher une ville, rue ou un lieu',zh:'搜索城市、街道或地点'})[language];
-        document.getElementById('cam-id').placeholder = ({en:'Windy webcam ID or player URL',es:'ID de cámara Windy o URL del reproductor',fr:'ID webcam Windy ou URL du lecteur',zh:'Windy 摄像头 ID 或播放器网址'})[language];
-        document.getElementById('mapbox-token').placeholder = ({en:'Mapbox public token (pk…)',es:'Token público Mapbox (pk…)',fr:'Jeton public Mapbox (pk…)',zh:'Mapbox 公开令牌（pk…）'})[language];
-      }
-      languageSelect.addEventListener('change', () => setLanguage(languageSelect.value));
-      setLanguage(language);
-
       const camStatus = document.getElementById('cam-status');
-      if (!window.L) { camStatus.textContent = 'Map library could not load. Check your internet connection and reload.'; return; }
-      const map = L.map('map', { center: [20, 0], zoom: 2, zoomControl: false, worldCopyJump: true });
-      L.control.zoom({ position: 'bottomleft' }).addTo(map);
-      const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors', maxZoom: 19 });
-      const cartoDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 19 });
+      if (!window.L) {
+        camStatus.textContent = 'The map library could not load. Check your internet connection and reload.';
+        camStatus.classList.add('error');
+        return;
+      }
+
+      const map = L.map('map', { center:[20,0], zoom:2, zoomControl:false, worldCopyJump:true });
+      L.control.zoom({ position:'bottomleft' }).addTo(map);
+      const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>', maxZoom:19
+      });
+      const cartoDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom:19
+      });
       const mapboxLayers = {};
       let mapboxToken = localStorage.getItem('lebuba-mapbox-token') || '';
       const tokenInput = document.getElementById('mapbox-token');
       tokenInput.value = mapboxToken;
       let activeLayer = 'osm';
       let currentLayer = osm.addTo(map);
-      let point = [20, 0];
+      let point = [20,0];
       let marker;
 
       function getMapboxLayer(style) {
         if (!mapboxToken || !mapboxToken.startsWith('pk.')) return null;
         const styleId = style === 'satellite' ? 'satellite-streets-v12' : 'streets-v12';
-        const key = style;
-        if (!mapboxLayers[key]) {
-          mapboxLayers[key] = L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/${styleId}/tiles/256/{z}/{x}/{y}?access_token=${encodeURIComponent(mapboxToken)}`, {
-            attribution: 'Map data &copy; OpenStreetMap contributors, Imagery &copy; Mapbox', maxZoom: 22, tileSize: 256
+        if (!mapboxLayers[style]) {
+          mapboxLayers[style] = L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/${styleId}/tiles/256/{z}/{x}/{y}?access_token=${encodeURIComponent(mapboxToken)}`, {
+            attribution:'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, imagery &copy; Mapbox', maxZoom:22, tileSize:256
           });
         }
-        return mapboxLayers[key];
+        return mapboxLayers[style];
       }
       function selectLayer(key) {
-        let next = key === 'osm' ? osm : key === 'dark' ? cartoDark : getMapboxLayer(key === 'mapbox-satellite' ? 'satellite' : 'streets');
+        const next = key === 'osm' ? osm : key === 'dark' ? cartoDark : getMapboxLayer(key === 'mapbox-satellite' ? 'satellite' : 'streets');
+        const status = document.getElementById('mapbox-status');
         if (!next) {
-          document.getElementById('mapbox-status').textContent = t(mapboxToken ? 'tokenInvalid' : 'tokenMissing');
+          status.textContent = mapboxToken ? 'That token was not accepted. Check it in your Mapbox account.' : 'Add a Mapbox public token above to use this style.';
+          status.classList.add('error');
           return;
         }
         if (currentLayer && map.hasLayer(currentLayer)) map.removeLayer(currentLayer);
@@ -177,19 +178,21 @@
         currentLayer.addTo(map);
         activeLayer = key;
         document.querySelectorAll('.layer').forEach(button => button.classList.toggle('active', button.dataset.layer === key));
+        document.getElementById('map-credit').textContent = key === 'dark' ? 'OpenStreetMap contributors, CARTO' : key.startsWith('mapbox') ? 'OpenStreetMap contributors, Mapbox' : 'OpenStreetMap contributors';
       }
       document.querySelectorAll('.layer').forEach(button => button.addEventListener('click', () => selectLayer(button.dataset.layer)));
       document.getElementById('save-mapbox-token').addEventListener('click', () => {
         const token = tokenInput.value.trim();
         const status = document.getElementById('mapbox-status');
-        if (!token.startsWith('pk.')) { status.textContent = t('tokenInvalid'); return; }
+        if (!token.startsWith('pk.')) { status.textContent = 'Enter a valid-looking public token beginning with pk.'; status.classList.add('error'); return; }
         mapboxToken = token;
         localStorage.setItem('lebuba-mapbox-token', token);
         Object.keys(mapboxLayers).forEach(key => { if (map.hasLayer(mapboxLayers[key])) map.removeLayer(mapboxLayers[key]); delete mapboxLayers[key]; });
-        status.textContent = t('tokenSaved');
+        status.textContent = 'Token saved in this browser.';
+        status.classList.remove('error');
         if (activeLayer.startsWith('mapbox')) selectLayer(activeLayer);
       });
-      map.on('click', event => { point = [event.latlng.lat, event.latlng.lng]; });
+      map.on('click', event => { point = [event.latlng.lat,event.latlng.lng]; });
 
       document.getElementById('search-form').addEventListener('submit', async event => {
         event.preventDefault();
@@ -197,54 +200,81 @@
         const button = document.getElementById('search-button');
         if (!query) return;
         button.disabled = true;
-        button.textContent = t('searching');
+        button.querySelector('span').textContent = 'Searching…';
         try {
-          const response = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&accept-language=${encodeURIComponent(language)}&q=${encodeURIComponent(query)}`);
+          const url = new URL('https://nominatim.openstreetmap.org/search');
+          url.search = new URLSearchParams({ format:'jsonv2', limit:'1', q:query }).toString();
+          const response = await fetch(url, { headers:{ 'Accept-Language':'en' } });
           if (!response.ok) throw new Error(`Search returned ${response.status}`);
           const results = await response.json();
-          if (!results.length) { alert(t('notFound')); return; }
+          if (!results.length) { alert('No matching place found. Try a nearby city or a more specific name.'); return; }
           const place = results[0];
-          point = [Number(place.lat), Number(place.lon)];
-          map.flyTo(point, 15, { duration: 1.4 });
+          point = [Number(place.lat),Number(place.lon)];
+          map.flyTo(point,15,{ duration:1.4 });
           if (marker) map.removeLayer(marker);
           marker = L.marker(point).addTo(map);
           const popup = document.createElement('span');
           popup.textContent = place.display_name;
           marker.bindPopup(popup).openPopup();
-        } catch (error) { console.error(error); alert(t('searchFailed')); }
-        finally { button.disabled = false; button.textContent = t('search'); }
+          document.getElementById('street-status').textContent = 'Location selected. Load Street View to check for imagery.';
+        } catch (error) {
+          console.error(error);
+          alert('Could not search right now. Check your connection and try again.');
+        } finally {
+          button.disabled = false;
+          button.querySelector('span').textContent = 'Explore';
+        }
       });
 
       document.getElementById('load-street').addEventListener('click', () => {
-        const [lat, lon] = point;
-        const panoUrl = new URL('https://maps.google.com/maps');
-        panoUrl.searchParams.set('layer', 'c');
-        panoUrl.searchParams.set('cbll', `${lat},${lon}`);
-        panoUrl.searchParams.set('cbp', '12,0,0,0,0');
-        panoUrl.searchParams.set('output', 'svembed');
-        document.getElementById('street-frame').src = panoUrl.toString();
-        document.getElementById('street-status').textContent = t('streetRequested');
+        const [lat,lon] = point;
+        const url = new URL('https://maps.google.com/maps');
+        url.search = new URLSearchParams({ layer:'c', cbll:`${lat},${lon}`, cbp:'12,0,0,0,0', output:'svembed' }).toString();
+        document.getElementById('street-frame').src = url.toString();
+        document.getElementById('street-status').textContent = 'Street View requested. Imagery may not be available at every location.';
       });
 
       document.getElementById('cam-form').addEventListener('submit', event => {
         event.preventDefault();
         const raw = document.getElementById('cam-id').value.trim();
-        const status = document.getElementById('cam-status');
+        const openLink = document.getElementById('open-cam');
+        const player = document.getElementById('webcam-player');
+        camStatus.classList.remove('error','success');
+        openLink.hidden = true;
         let id = raw;
-        if (/^https:\/\//i.test(raw)) {
+        if (/^https?:\/\//i.test(raw)) {
           try {
             const parsed = new URL(raw);
-            if (parsed.hostname !== 'webcams.windy.com') throw new Error('Unrecognized provider');
+            if (parsed.protocol !== 'https:' || parsed.hostname !== 'webcams.windy.com') throw new Error('Unsupported webcam URL');
             const match = parsed.pathname.match(/^\/webcams\/public\/embed\/player\/([A-Za-z0-9_-]+)\/?$/);
-            if (!match) throw new Error('Invalid player URL');
+            if (!match) throw new Error('Not a Windy player URL');
             id = match[1];
-          } catch (error) { status.textContent = t('badCam'); return; }
+          } catch (error) {
+            camStatus.textContent = 'Use a Windy webcam ID or its official player URL.';
+            camStatus.classList.add('error');
+            return;
+          }
         }
-        if (!/^[A-Za-z0-9_-]{2,100}$/.test(id)) { status.textContent = t('badCam'); return; }
-        const player = document.getElementById('webcam-player');
-        player.src = `https://webcams.windy.com/webcams/public/embed/player/${encodeURIComponent(id)}`;
-        status.textContent = t('camLoading');
-        player.onload = () => { status.textContent = t('camLoaded'); };
+        if (!/^[A-Za-z0-9_-]{2,100}$/.test(id)) {
+          camStatus.textContent = 'That ID does not look right. Paste a webcam ID or official Windy player URL.';
+          camStatus.classList.add('error');
+          return;
+        }
+        const playerUrl = `https://webcams.windy.com/webcams/public/embed/player/${encodeURIComponent(id)}`;
+        openLink.href = `https://www.windy.com/webcams/${encodeURIComponent(id)}`;
+        openLink.hidden = false;
+        camStatus.textContent = 'Loading the player… If it stays blank, this camera may not allow embedding.';
+        player.onload = () => {
+          camStatus.textContent = 'The player frame loaded. If playback is unavailable, open this camera on Windy.';
+          camStatus.classList.add('success');
+        };
+        player.src = playerUrl;
+        window.setTimeout(() => {
+          if (player.src === playerUrl && !camStatus.classList.contains('success')) {
+            camStatus.textContent = 'This camera may block embedded playback. Try “Open on Windy” or choose another public camera.';
+            camStatus.classList.add('error');
+          }
+        }, 9000);
       });
 
       requestAnimationFrame(() => map.invalidateSize());
